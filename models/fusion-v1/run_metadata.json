@@ -1,0 +1,15 @@
+{
+  "dataset_version": "dataset-synthetic-v1",
+  "model_version": "fusion-v1",
+  "feature_version": "features-v1",
+  "pipeline_version": "pipeline-v1",
+  "random_seed": 42,
+  "timestamp": "2026-09-19T17:23:35.649611+00:00",
+  "python_version": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "dependencies": {
+    "numpy": "2.2.6",
+    "scikit_learn": "1.7.2"
+  },
+  "warning": "Evaluation is synthetic/demo data unless the supplied manifest states otherwise."
+}

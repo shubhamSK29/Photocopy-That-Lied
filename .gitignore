@@ -1,0 +1,47 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Node / React
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+
+# Runtime / generated data
+uploads/
+artifacts/
+reports/
+dataset/
+analysis.db
+
+# Local test image
+test_image.jpg
+
+# Trained/generated model artifacts
+models/*.joblib
+models/*.json
+
+# Local databases
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

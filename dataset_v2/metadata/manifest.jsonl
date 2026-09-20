@@ -1,0 +1,5 @@
+# Dataset V2 Empty Manifest Template
+# This file should be replaced with actual metadata in JSONL format
+# Each line should be a JSON object conforming to schema.json
+# Example line format:
+# {"image_id":"IMG_000001","source_id":"SRC_000123","label":0,"category":"original","width":1920,"height":1080,"format":"JPEG","color_mode":"RGB","generation_method":"real_camera","processing_operations":[],"metadata_available":true,"dataset_version":"dataset-real-v1"}

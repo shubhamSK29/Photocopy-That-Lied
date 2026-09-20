@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run backend tests
+      run: |
+        python -m pytest backend/tests/ -v --tb=short
+    
+    - name: Run model pipeline validation
+      run: |
+        python scripts/generate_dataset.py --per-device 2
+        python scripts/train_model.py --manifest dataset/manifests/dataset.csv --output-dir models --dataset-version dataset-synthetic-v1
+        python scripts/evaluate_model.py --manifest dataset/manifests/dataset.csv
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm test -- --run
+    
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run end-to-end API tests
+      run: |
+        python -m pytest backend/tests/test_fusion_and_api.py::test_end_to_end_analysis_flow -v
+
+  schema-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Validate feature schema consistency
+      run: |
+        python -c "
+from backend.features.feature_builder import FEATURE_NAMES, FEATURE_VERSION
+from backend.fusion.model import load_model
+from pathlib import Path
+import json
+
+# Check current feature schema
+print('Current feature version:', FEATURE_VERSION)
+print('Feature names:', FEATURE_NAMES)
+
+# Check if model exists and validate schema
+model_path = Path('models/fusion_model.joblib')
+if model_path.exists():
+    model = load_model(model_path)
+    if model:
+        print('Model feature version:', model.feature_version)
+        print('Model feature names:', model.feature_names)
+        if model.feature_names != FEATURE_NAMES:
+            raise ValueError('Feature schema mismatch between model and code')
+        print('Schema validation: PASSED')
+    else:
+        print('No model loaded - schema validation skipped')
+else:
+    print('No model file found - schema validation skipped')
+"

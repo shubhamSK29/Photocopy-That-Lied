@@ -1,0 +1,169 @@
+{
+  "version": "dataset-v2-schema-1.0",
+  "description": "Metadata schema for Photocopy That Lied Dataset V2",
+  "created": "2026-09-20",
+  "fields": {
+    "image_id": {
+      "type": "string",
+      "required": true,
+      "description": "Unique identifier for this image (e.g., IMG_000001)"
+    },
+    "source_id": {
+      "type": "string",
+      "required": true,
+      "description": "Unique identifier for the source photograph (e.g., SRC_000123)"
+    },
+    "label": {
+      "type": "integer",
+      "required": true,
+      "allowed_values": [0, 1],
+      "description": "0 = genuine, 1 = manipulated"
+    },
+    "category": {
+      "type": "string",
+      "required": true,
+      "allowed_values": [
+        "original",
+        "natural_processing",
+        "hard_negative",
+        "copy_move",
+        "splicing",
+        "object_removal",
+        "inpainting",
+        "resampling",
+        "timestamp",
+        "mixed"
+      ],
+      "description": "Category describing the image type"
+    },
+    "manipulation_type": {
+      "type": "string",
+      "required": false,
+      "description": "Type of manipulation (if applicable)",
+      "allowed_values": [
+        "copy_move",
+        "splicing",
+        "object_removal",
+        "inpainting",
+        "resampling",
+        "timestamp_modification",
+        "mixed"
+      ]
+    },
+    "parent_image_id": {
+      "type": "string",
+      "required": false,
+      "description": "ID of parent image if this is a derived image"
+    },
+    "mask_path": {
+      "type": "string",
+      "required": false,
+      "description": "Path to ground-truth mask (if applicable)"
+    },
+    "width": {
+      "type": "integer",
+      "required": true,
+      "description": "Image width in pixels"
+    },
+    "height": {
+      "type": "integer",
+      "required": true,
+      "description": "Image height in pixels"
+    },
+    "format": {
+      "type": "string",
+      "required": true,
+      "allowed_values": ["JPEG", "PNG", "WEBP"],
+      "description": "Image file format"
+    },
+    "color_mode": {
+      "type": "string",
+      "required": true,
+      "allowed_values": ["RGB", "RGBA", "L", "LA"],
+      "description": "Image color mode"
+    },
+    "generation_method": {
+      "type": "string",
+      "required": true,
+      "allowed_values": ["real_camera", "synthetic_generation"],
+      "description": "How the image was created"
+    },
+    "processing_operations": {
+      "type": "array",
+      "required": false,
+      "items": {
+        "type": "string"
+      },
+      "description": "List of processing operations applied (e.g., resize, jpeg_compress)"
+    },
+    "manipulation_parameters": {
+      "type": "object",
+      "required": false,
+      "description": "Parameters used for manipulation generation"
+    },
+    "device_id": {
+      "type": "string",
+      "required": false,
+      "description": "Device/camera identifier"
+    },
+    "session_id": {
+      "type": "string",
+      "required": false,
+      "description": "Session identifier for grouped captures"
+    },
+    "metadata_available": {
+      "type": "boolean",
+      "required": true,
+      "description": "Whether EXIF/metadata is available"
+    },
+    "sha256": {
+      "type": "string",
+      "required": false,
+      "description": "SHA-256 hash of the image file"
+    },
+    "provenance": {
+      "type": "object",
+      "required": false,
+      "description": "Image provenance information (source, license, collection date, etc.)"
+    },
+    "dataset_version": {
+      "type": "string",
+      "required": true,
+      "description": "Dataset version identifier (e.g., dataset-real-v1)"
+    },
+    "collection_date": {
+      "type": "string",
+      "required": false,
+      "description": "Date image was collected (ISO 8601 format)"
+    },
+    "notes": {
+      "type": "string",
+      "required": false,
+      "description": "Additional notes or observations"
+    }
+  },
+  "mask_encoding": {
+    "description": "Ground-truth mask pixel encoding",
+    "values": {
+      "0": "non-manipulated pixel",
+      "1": "manipulated pixel"
+    },
+    "format": "PNG",
+    "required_for_manipulated": true
+  },
+  "label_encoding": {
+    "description": "Label encoding for classification",
+    "values": {
+      "0": "genuine",
+      "1": "manipulated"
+    }
+  },
+  "important_rules": [
+    "Natural processing variants (resize, JPEG, etc.) must remain label=0 (genuine)",
+    "Hard negatives (repetitive patterns, heavy JPEG, etc.) must remain label=0 (genuine)",
+    "Missing EXIF metadata does NOT imply manipulation",
+    "Source_id must be consistent across all variants of the same source image",
+    "All variants of the same source must remain in the same train/validation/test split",
+    "Ground-truth masks are required for all manipulated images where localization is possible"
+  ]
+}
