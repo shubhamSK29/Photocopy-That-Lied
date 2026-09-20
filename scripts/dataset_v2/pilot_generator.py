@@ -129,6 +129,10 @@ class PilotGenerator:
         sharpen = self.config.sharpen_strength_range[source_idx % len(self.config.sharpen_strength_range)]
         brightness = 1.0 + self.config.brightness_range[source_idx % len(self.config.brightness_range)] / 100.0
         contrast = self.config.contrast_range[source_idx % len(self.config.contrast_range)]
+        color = self.config.color_range[source_idx % len(self.config.color_range)]
+        gamma = self.config.gamma_range[source_idx % len(self.config.gamma_range)]
+        denoise = self.config.denoise_strength_range[source_idx % len(self.config.denoise_strength_range)]
+        target_format = self.config.format_options[source_idx % len(self.config.format_options)]
 
         operations = [
             ('jpeg_recompression', {'quality': quality}),
@@ -136,6 +140,10 @@ class PilotGenerator:
             ('sharpen', {'strength': sharpen}),
             ('brightness', {'factor': brightness}),
             ('contrast', {'factor': contrast}),
+            ('color', {'factor': color}),
+            ('gamma', {'gamma': gamma}),
+            ('denoise', {'strength': denoise}),
+            ('format_conversion', {'target_format': target_format}),
         ]
 
         for op_name, params in operations:
@@ -151,6 +159,14 @@ class PilotGenerator:
                     result = NaturalProcessingGenerator.adjust_brightness(image, params['factor'])
                 elif op_name == 'contrast':
                     result = NaturalProcessingGenerator.adjust_contrast(image, params['factor'])
+                elif op_name == 'color':
+                    result = NaturalProcessingGenerator.adjust_color(image, params['factor'])
+                elif op_name == 'gamma':
+                    result = NaturalProcessingGenerator.adjust_gamma(image, params['gamma'])
+                elif op_name == 'denoise':
+                    result = NaturalProcessingGenerator.denoise(image, params['strength'])
+                elif op_name == 'format_conversion':
+                    result = NaturalProcessingGenerator.format_conversion(image, params['target_format'])
                 else:
                     continue
 
@@ -215,11 +231,17 @@ class PilotGenerator:
         hn_quality = self.config.hn_jpeg_quality_range[source_idx % len(self.config.hn_jpeg_quality_range)]
         hn_scale = self.config.hn_resize_scale_range[source_idx % len(self.config.hn_resize_scale_range)]
         hn_sharpen = self.config.hn_sharpen_strength_range[source_idx % len(self.config.hn_sharpen_strength_range)]
+        hn_color = self.config.hn_color_range[source_idx % len(self.config.hn_color_range)]
+        hn_gamma = self.config.hn_gamma_range[source_idx % len(self.config.hn_gamma_range)]
+        hn_denoise = self.config.hn_denoise_strength_range[source_idx % len(self.config.hn_denoise_strength_range)]
 
         operations = [
             ('jpeg_recompression', {'quality': hn_quality}),
             ('resize', {'scale': hn_scale}),
             ('sharpen', {'strength': hn_sharpen}),
+            ('color', {'factor': hn_color}),
+            ('gamma', {'gamma': hn_gamma}),
+            ('denoise', {'strength': hn_denoise}),
         ]
 
         for op_name, params in operations:
@@ -231,6 +253,12 @@ class PilotGenerator:
                     result = NaturalProcessingGenerator.resize(image, params['scale'])
                 elif op_name == 'sharpen':
                     result = NaturalProcessingGenerator.sharpen(image, params['strength'])
+                elif op_name == 'color':
+                    result = NaturalProcessingGenerator.adjust_color(image, params['factor'])
+                elif op_name == 'gamma':
+                    result = NaturalProcessingGenerator.adjust_gamma(image, params['gamma'])
+                elif op_name == 'denoise':
+                    result = NaturalProcessingGenerator.denoise(image, params['strength'])
                 else:
                     continue
 

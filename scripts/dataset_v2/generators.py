@@ -51,6 +51,44 @@ class NaturalProcessingGenerator:
         enhancer = ImageEnhance.Color(image)
         return enhancer.enhance(factor)
 
+    @staticmethod
+    def adjust_gamma(image: Image.Image, gamma: float) -> Image.Image:
+        """Apply gamma correction (gamma: 0.5=darker, 1.0=original, 2.0=brighter)."""
+        # Gamma correction formula: output = input^gamma
+        img_array = np.array(image).astype(np.float32) / 255.0
+        img_array = np.power(img_array, gamma)
+        img_array = (img_array * 255.0).astype(np.uint8)
+        return Image.fromarray(img_array)
+
+    @staticmethod
+    def denoise(image: Image.Image, strength: float = 1.0) -> Image.Image:
+        """Apply denoising using median filter (strength: 1-5)."""
+        import cv2
+        img_array = np.array(image)
+        # Use median filter for denoising
+        kernel_size = int(strength * 2 + 1)  # 3, 5, 7, 9, 11
+        kernel_size = max(3, min(kernel_size, 11))
+        if kernel_size % 2 == 0:
+            kernel_size += 1
+        denoised = cv2.medianBlur(img_array, kernel_size)
+        return Image.fromarray(denoised)
+
+    @staticmethod
+    def format_conversion(image: Image.Image, target_format: str = 'PNG') -> Image.Image:
+        """Convert image format (JPEG <-> PNG) with quality preservation."""
+        import io
+        buffer = io.BytesIO()
+        
+        if target_format.upper() == 'PNG':
+            image.save(buffer, format='PNG')
+        elif target_format.upper() == 'JPEG':
+            image.save(buffer, format='JPEG', quality=95)
+        else:
+            return image  # No conversion
+        
+        buffer.seek(0)
+        return Image.open(buffer)
+
 
 class ManipulationGenerator:
     """Generates manipulated variants."""

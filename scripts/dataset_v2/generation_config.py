@@ -31,11 +31,18 @@ class GenerationConfig:
     sharpen_strength_range: List[float] = field(default_factory=lambda: [0.5, 1.5, 2.0])  # Exclude 1.0 (no-op)
     brightness_range: List[float] = field(default_factory=lambda: [-30, -15, 15, 30])  # Exclude 0 (no-op)
     contrast_range: List[float] = field(default_factory=lambda: [0.7, 0.85, 1.15, 1.3])  # Exclude 1.0 (no-op)
+    color_range: List[float] = field(default_factory=lambda: [0.7, 0.85, 1.15, 1.3])  # Exclude 1.0 (no-op)
+    gamma_range: List[float] = field(default_factory=lambda: [0.7, 0.8, 1.2, 1.5])  # Exclude 1.0 (no-op)
+    denoise_strength_range: List[float] = field(default_factory=lambda: [1.0, 2.0, 3.0])
+    format_options: List[str] = field(default_factory=lambda: ['JPEG', 'PNG'])
 
     # Hard negative parameter ranges (more aggressive, non-overlapping with natural processing)
     hn_jpeg_quality_range: List[int] = field(default_factory=lambda: [50, 55, 60, 65])  # Lower quality than natural
     hn_resize_scale_range: List[float] = field(default_factory=lambda: [0.3, 0.4, 0.6, 0.8])  # Different from natural (no 0.5, 0.75, 0.9)
     hn_sharpen_strength_range: List[float] = field(default_factory=lambda: [2.5, 3.0, 3.5])  # Stronger than natural
+    hn_color_range: List[float] = field(default_factory=lambda: [0.5, 0.6, 1.4, 1.5])  # More aggressive color
+    hn_gamma_range: List[float] = field(default_factory=lambda: [0.5, 0.6, 1.6, 2.0])  # More aggressive gamma
+    hn_denoise_strength_range: List[float] = field(default_factory=lambda: [4.0, 5.0])  # Stronger denoising
 
     # Manipulation parameter ranges
     manipulation_area_ratio_range: List[float] = field(default_factory=lambda: [0.05, 0.1, 0.15, 0.2, 0.25, 0.3])
