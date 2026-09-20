@@ -1,181 +1,115 @@
-"""Generate dataset statistics for Dataset V2."""
-
-from __future__ import annotations
+"""Generate comprehensive dataset statistics for Dataset V2."""
 
 import json
 from pathlib import Path
-from typing import Dict, List
-
+from collections import Counter
 import numpy as np
-from PIL import Image
 
-ROOT = Path(__file__).resolve().parent.parent
-DATASET_V2 = ROOT / "dataset_v2"
-METADATA_DIR = DATASET_V2 / "metadata"
-MANIFEST_FILE = METADATA_DIR / "manifest.jsonl"
+manifest_path = Path(__file__).resolve().parent.parent / "dataset_v2" / "metadata" / "manifest.jsonl"
 
+records = []
+with manifest_path.open() as f:
+    for line in f:
+        if line.strip():
+            records.append(json.loads(line))
 
-def load_manifest() -> List[Dict]:
-    """Load manifest from JSONL."""
-    rows = []
-    with MANIFEST_FILE.open() as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            rows.append(json.loads(line))
-    return rows
+print("=== DATASET V2 STATISTICS ===\n")
 
+# Basic counts
+total = len(records)
+by_category = Counter(r['category'] for r in records)
+by_label = Counter(r['label'] for r in records)
 
-def compute_statistics(rows: List[Dict]) -> Dict:
-    """Compute comprehensive dataset statistics."""
-    stats = {
-        "total_images": len(rows),
-        "genuine": 0,
-        "manipulated": 0,
-        "natural_processing": 0,
-        "hard_negatives": 0,
-        "manipulation_types": {},
-        "unique_sources": 0,
-        "images_per_source": {},
-        "resolution_distribution": {},
-        "format_distribution": {},
-        "color_mode_distribution": {},
-        "mask_coverage": 0,
-        "device_distribution": {},
-        "generation_method_distribution": {}
-    }
-    
-    for row in rows:
-        # Labels
-        if row.get("label") == 0:
-            stats["genuine"] += 1
-        else:
-            stats["manipulated"] += 1
-        
-        # Categories
-        category = row.get("category", "unknown")
-        if category == "natural_processing":
-            stats["natural_processing"] += 1
-        elif category == "hard_negative":
-            stats["hard_negatives"] += 1
-        
-        # Manipulation types
-        if row.get("label") == 1:
-            manipulation_type = row.get("manipulation_type", "unknown")
-            stats["manipulation_types"][manipulation_type] = stats["manipulation_types"].get(manipulation_type, 0) + 1
-        
-        # Sources
-        source_id = row.get("source_id")
-        if source_id:
-            stats["images_per_source"][source_id] = stats["images_per_source"].get(source_id, 0) + 1
-        
-        # Image properties
-        image_path = DATASET_V2 / row.get("image_path", "")
-        if image_path.exists():
-            try:
-                img = Image.open(image_path)
-                resolution = f"{img.width}x{img.height}"
-                stats["resolution_distribution"][resolution] = stats["resolution_distribution"].get(resolution, 0) + 1
-                stats["format_distribution"][img.format] = stats["format_distribution"].get(img.format, 0) + 1
-                stats["color_mode_distribution"][img.mode] = stats["color_mode_distribution"].get(img.mode, 0) + 1
-            except:
-                pass
-        
-        # Device distribution
-        device_id = row.get("device_id")
-        if device_id:
-            stats["device_distribution"][device_id] = stats["device_distribution"].get(device_id, 0) + 1
-        
-        # Generation method
-        gen_method = row.get("generation_method")
-        if gen_method:
-            stats["generation_method_distribution"][gen_method] = stats["generation_method_distribution"].get(gen_method, 0) + 1
-    
-    stats["unique_sources"] = len(stats["images_per_source"])
-    
-    # Mask coverage
-    manipulated_images = [r for r in rows if r.get("label") == 1]
-    if manipulated_images:
-        with_masks = sum(1 for r in manipulated_images if r.get("mask_path"))
-        stats["mask_coverage"] = with_masks / len(manipulated_images)
-    
-    return stats
+print("TOTAL RECORDS:", total)
+print("\nCATEGORY DISTRIBUTION:")
+for cat, count in by_category.items():
+    print(f"  {cat}: {count} ({count/total*100:.1f}%)")
 
+print("\nLABEL DISTRIBUTION:")
+for label, count in by_label.items():
+    print(f"  Label {label}: {count} ({count/total*100:.1f}%)")
 
-def print_report(stats: Dict):
-    """Print statistics report."""
-    print("=" * 80)
-    print("DATASET V2 STATISTICS")
-    print("=" * 80)
-    
-    print(f"\n[OVERALL]")
-    print(f"Total images: {stats['total_images']}")
-    print(f"Genuine: {stats['genuine']} ({stats['genuine']/stats['total_images']:.1%})")
-    print(f"Manipulated: {stats['manipulated']} ({stats['manipulated']/stats['total_images']:.1%})")
-    print(f"Natural processing: {stats['natural_processing']}")
-    print(f"Hard negatives: {stats['hard_negatives']}")
-    
-    print(f"\n[SOURCE DIVERSITY]")
-    print(f"Unique sources: {stats['unique_sources']}")
-    print(f"Images per source (min/max/avg):")
-    if stats['images_per_source']:
-        counts = list(stats['images_per_source'].values())
-        print(f"  Min: {min(counts)}")
-        print(f"  Max: {max(counts)}")
-        print(f"  Avg: {np.mean(counts):.1f}")
-    
-    print(f"\n[MANIPULATION TYPES]")
-    for mtype, count in stats['manipulation_types'].items():
-        print(f"  {mtype}: {count}")
-    
-    print(f"\n[RESOLUTION DISTRIBUTION]")
-    for res, count in sorted(stats['resolution_distribution'].items()):
-        print(f"  {res}: {count}")
-    
-    print(f"\n[FORMAT DISTRIBUTION]")
-    for fmt, count in stats['format_distribution'].items():
-        print(f"  {fmt}: {count}")
-    
-    print(f"\n[COLOR MODE DISTRIBUTION]")
-    for mode, count in stats['color_mode_distribution'].items():
-        print(f"  {mode}: {count}")
-    
-    print(f"\n[MASK COVERAGE]")
-    print(f"Manipulated images with masks: {stats['mask_coverage']:.1%}")
-    
-    print(f"\n[DEVICE DISTRIBUTION]")
-    for device, count in stats['device_distribution'].items():
-        print(f"  {device}: {count}")
-    
-    print(f"\n[GENERATION METHOD]")
-    for method, count in stats['generation_method_distribution'].items():
-        print(f"  {method}: {count}")
-    
-    print("\n" + "=" * 80)
+# Manipulation type breakdown
+manip_records = [r for r in records if r['category'] == 'manipulated']
+manip_by_type = Counter(r['manipulation_type'] for r in manip_records)
 
+print("\nMANIPULATION TYPE DISTRIBUTION:")
+for man_type, count in manip_by_type.items():
+    print(f"  {man_type}: {count}")
 
-def main():
-    """Main function."""
-    print("Generating Dataset V2 statistics...")
-    
-    rows = load_manifest()
-    print(f"Loaded {len(rows)} images from manifest")
-    
-    stats = compute_statistics(rows)
-    
-    print_report(stats)
-    
-    # Save report
-    report_file = ROOT / "reports" / "PHASE_2_DATASET_STATISTICS.json"
-    report_file.parent.mkdir(exist_ok=True)
-    with report_file.open("w") as f:
-        json.dump(stats, f, indent=2)
-    
-    print(f"\nStatistics saved to: {report_file}")
-    
-    return 0
+# Manipulation area ratio statistics
+area_ratios = []
+for record in manip_records:
+    ratio = record.get('parameters', {}).get('manipulation_area_ratio')
+    if ratio is not None:
+        area_ratios.append(ratio)
 
+if area_ratios:
+    print(f"\nMANIPULATION AREA RATIO STATISTICS:")
+    print(f"  Count: {len(area_ratios)}")
+    print(f"  Min: {min(area_ratios):.4f}")
+    print(f"  Max: {max(area_ratios):.4f}")
+    print(f"  Mean: {np.mean(area_ratios):.4f}")
+    print(f"  Median: {np.median(area_ratios):.4f}")
+    print(f"  Std: {np.std(area_ratios):.4f}")
+    print(f"  Unique values: {len(set(area_ratios))}")
 
-if __name__ == "__main__":
-    exit(main())
+# Source utilization
+sources_by_variants = Counter(r['source_id'] for r in records)
+unique_sources = len(sources_by_variants)
+
+print(f"\nSOURCE UTILIZATION:")
+print(f"  Unique sources: {unique_sources}")
+print(f"  Min variants per source: {min(sources_by_variants.values())}")
+print(f"  Max variants per source: {max(sources_by_variants.values())}")
+print(f"  Mean variants per source: {np.mean(list(sources_by_variants.values())):.1f}")
+print(f"  Median variants per source: {np.median(list(sources_by_variants.values())):.1f}")
+
+# Split distribution
+split_counts = {}
+for record in records:
+    params = record.get('parameters', {})
+    if 'split' in params:
+        split = params['split']
+        split_counts[split] = split_counts.get(split, 0) + 1
+
+if split_counts:
+    print(f"\nSPLIT DISTRIBUTION (for donor-based manipulations):")
+    for split, count in split_counts.items():
+        print(f"  {split}: {count}")
+
+# Processing operation distribution
+np_ops = Counter()
+hn_ops = Counter()
+for record in records:
+    if record['category'] == 'natural_processing':
+        for op in record.get('processing_operations', []):
+            np_ops[op] += 1
+    elif record['category'] == 'hard_negative':
+        for op in record.get('processing_operations', []):
+            hn_ops[op] += 1
+
+print(f"\nNATURAL-PROCESSING OPERATIONS:")
+for op, count in np_ops.items():
+    print(f"  {op}: {count}")
+
+print(f"\nHARD-NEGATIVE OPERATIONS:")
+for op, count in hn_ops.items():
+    print(f"  {op}: {count}")
+
+# Source family balance
+sources_with_categories = {}
+for record in records:
+    source_id = record['source_id']
+    if source_id not in sources_with_categories:
+        sources_with_categories[source_id] = set()
+    sources_with_categories[source_id].add(record['category'])
+
+category_per_source = [len(cats) for cats in sources_with_categories.values()]
+print(f"\nSOURCE CATEGORY DIVERSITY:")
+print(f"  Sources with 1 category: {category_per_source.count(1)}")
+print(f"  Sources with 2 categories: {category_per_source.count(2)}")
+print(f"  Sources with 3 categories: {category_per_source.count(3)}")
+print(f"  Sources with 4 categories: {category_per_source.count(4)}")
+
+print("\n=== STATISTICS COMPLETE ===")
