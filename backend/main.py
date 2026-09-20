@@ -2,9 +2,12 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from backend import config
 from backend.api import analyze, health, reports
@@ -36,6 +39,23 @@ app.include_router(health.router)
 app.include_router(analyze.router)
 app.include_router(reports.router)
 
+# Serve React frontend if production build exists
+frontend_dist = Path(__file__).parent.parent / "frontend" / "dist"
+if frontend_dist.exists() and (frontend_dist / "index.html").exists():
+    app.mount("/app", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
+    logging.getLogger("ptl").info("React frontend mounted at /app")
+
+    # Redirect root to /app when frontend is available
+    @app.get("/")
+    def redirect_to_frontend() -> Response:
+        return RedirectResponse(url="/app")
+else:
+    # Root route when no frontend is available
+    @app.get("/")
+    def root() -> dict:
+        return {"name": "Photocopy That Lied", "docs": "/docs", "health": "/api/health"}
+    logging.getLogger("ptl").info("React frontend not found, serving API only")
+
 
 @app.on_event("startup")
 def _startup() -> None:
@@ -43,6 +63,4 @@ def _startup() -> None:
     logging.getLogger("ptl").info("database ready at %s", config.DB_PATH)
 
 
-@app.get("/")
-def root() -> dict:
-    return {"name": "Photocopy That Lied", "docs": "/docs", "health": "/api/health"}
+

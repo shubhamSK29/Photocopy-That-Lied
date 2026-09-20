@@ -209,9 +209,7 @@ class TestMetadataSchemaValidation:
         assert "allowed_values" in category_field
         
         expected_categories = [
-            "original", "natural_processing", "hard_negative",
-            "copy_move", "splicing", "object_removal", 
-            "inpainting", "resampling", "timestamp", "mixed"
+            "original", "natural_processing", "hard_negative", "manipulated"
         ]
         
         for cat in expected_categories:

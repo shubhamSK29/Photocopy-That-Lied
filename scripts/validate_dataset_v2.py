@@ -103,8 +103,33 @@ def validate_file_integrity(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
         "image_properties": {}
     }
     
+    # Build SHA-256 to filename mapping for source directory lookup
+    SOURCES_DIR = DATASET_V2 / "sources"
+    sha256_to_file = {}
+    if SOURCES_DIR.exists():
+        for source_dir in SOURCES_DIR.rglob("images"):
+            if source_dir.is_dir():
+                for img_path in source_dir.glob("*.jpg"):
+                    try:
+                        sha256_hash = compute_sha256(img_path)
+                        sha256_to_file[sha256_hash] = img_path
+                    except Exception:
+                        pass
+    
     for row in rows:
-        image_path = DATASET_V2 / row.get("image_path", "")
+        image_path = None
+        
+        # First try to use explicit image_path if present
+        if row.get("image_path"):
+            # image_path is relative to project root, not DATASET_V2
+            image_path = ROOT / row["image_path"]
+        # Otherwise, locate by SHA-256 in source directories
+        elif row.get("sha256") and row["sha256"] in sha256_to_file:
+            image_path = sha256_to_file[row["sha256"]]
+        else:
+            results["missing_files"].append(row.get("image_id", "unknown"))
+            continue
+        
         if not image_path.exists():
             results["missing_files"].append(row.get("image_id", "unknown"))
             continue
@@ -190,6 +215,19 @@ def validate_masks(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
         "mask_empty": []
     }
     
+    # Build SHA-256 to filename mapping for source directory lookup
+    SOURCES_DIR = DATASET_V2 / "sources"
+    sha256_to_file = {}
+    if SOURCES_DIR.exists():
+        for source_dir in SOURCES_DIR.rglob("images"):
+            if source_dir.is_dir():
+                for img_path in source_dir.glob("*.jpg"):
+                    try:
+                        sha256_hash = compute_sha256(img_path)
+                        sha256_to_file[sha256_hash] = img_path
+                    except Exception:
+                        pass
+    
     for row in rows:
         if row.get("label") != 1:
             continue  # Only check manipulated images
@@ -199,13 +237,23 @@ def validate_masks(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
             results["manipulated_without_masks"].append(row.get("image_id"))
             continue
         
-        mask_file = DATASET_V2 / mask_path
+        # mask_path is relative to project root, not DATASET_V2
+        mask_file = ROOT / mask_path
         if not mask_file.exists():
             results["manipulated_without_masks"].append(row.get("image_id"))
             continue
         
-        # Check mask dimensions match image
-        image_path = DATASET_V2 / row.get("image_path", "")
+        # Locate image file
+        image_path = None
+        if row.get("image_path"):
+            # image_path is relative to project root, not DATASET_V2
+            image_path = ROOT / row["image_path"]
+        elif row.get("sha256") and row["sha256"] in sha256_to_file:
+            image_path = sha256_to_file[row["sha256"]]
+        
+        if not image_path or not image_path.exists():
+            continue  # Skip mask validation if image not found
+        
         try:
             img = Image.open(image_path)
             img_width, img_height = img.size
@@ -244,8 +292,32 @@ def detect_duplicates(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     
     sha256_map = {}
     
+    # Build SHA-256 to filename mapping for source directory lookup
+    SOURCES_DIR = DATASET_V2 / "sources"
+    sha256_to_file = {}
+    if SOURCES_DIR.exists():
+        for source_dir in SOURCES_DIR.rglob("images"):
+            if source_dir.is_dir():
+                for img_path in source_dir.glob("*.jpg"):
+                    try:
+                        sha256_hash = compute_sha256(img_path)
+                        sha256_to_file[sha256_hash] = img_path
+                    except Exception:
+                        pass
+    
     for row in rows:
-        image_path = DATASET_V2 / row.get("image_path", "")
+        image_path = None
+        
+        # First try to use explicit image_path if present
+        if row.get("image_path"):
+            # image_path is relative to project root, not DATASET_V2
+            image_path = ROOT / row["image_path"]
+        # Otherwise, locate by SHA-256 in source directories
+        elif row.get("sha256") and row["sha256"] in sha256_to_file:
+            image_path = sha256_to_file[row["sha256"]]
+        else:
+            continue
+        
         if not image_path.exists():
             continue
         

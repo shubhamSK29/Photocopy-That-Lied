@@ -26,13 +26,7 @@
         "original",
         "natural_processing",
         "hard_negative",
-        "copy_move",
-        "splicing",
-        "object_removal",
-        "inpainting",
-        "resampling",
-        "timestamp",
-        "mixed"
+        "manipulated"
       ],
       "description": "Category describing the image type"
     },
@@ -55,10 +49,35 @@
       "required": false,
       "description": "ID of parent image if this is a derived image"
     },
+    "parent_source_id": {
+      "type": "string",
+      "required": false,
+      "description": "Source ID of parent image for derived images"
+    },
+    "variant_id": {
+      "type": "string",
+      "required": false,
+      "description": "Unique identifier for this variant (derived from parent + operation + parameters)"
+    },
     "mask_path": {
       "type": "string",
       "required": false,
       "description": "Path to ground-truth mask (if applicable)"
+    },
+    "mask_id": {
+      "type": "string",
+      "required": false,
+      "description": "Unique identifier for the mask"
+    },
+    "parameters": {
+      "type": "object",
+      "required": false,
+      "description": "Parameters used for generation (operation-specific)"
+    },
+    "seed": {
+      "type": "integer",
+      "required": false,
+      "description": "Random seed used for generation (for reproducibility)"
     },
     "width": {
       "type": "integer",

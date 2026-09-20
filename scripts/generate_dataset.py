@@ -167,7 +167,7 @@ def save_jpeg(path: Path, rgb: np.ndarray, quality: int) -> None:
     Image.fromarray(rgb).save(path, "JPEG", quality=int(quality))
 
 
-def copy_move(rgb: np.ndarray, seed: int) -> np.ndarray:
+def copy_move(rgb: np.ndarray, seed: int) -> tuple[np.ndarray, np.ndarray]:
     rng = _rng(seed)
     h, w = rgb.shape[:2]
     out = rgb.copy()
@@ -185,10 +185,14 @@ def copy_move(rgb: np.ndarray, seed: int) -> np.ndarray:
     out[dy:dy + ph, dx:dx + pw] = np.clip(
         region * (1 - mask) + patch.astype(np.float32) * mask, 0, 255
     ).astype(np.uint8)
-    return out
+    
+    # Ground-truth binary mask (1 for manipulated destination region, 0 elsewhere)
+    full_mask = np.zeros((h, w), dtype=np.uint8)
+    full_mask[dy:dy + ph, dx:dx + pw] = (mask[..., 0] > 0.1).astype(np.uint8)
+    return out, full_mask
 
 
-def splice(rgb: np.ndarray, donor: np.ndarray, seed: int) -> np.ndarray:
+def splice(rgb: np.ndarray, donor: np.ndarray, seed: int) -> tuple[np.ndarray, np.ndarray]:
     rng = _rng(seed)
     h, w = rgb.shape[:2]
     out = rgb.copy()
@@ -213,7 +217,11 @@ def splice(rgb: np.ndarray, donor: np.ndarray, seed: int) -> np.ndarray:
     out[dy:dy + ph, dx:dx + pw] = np.clip(
         region * (1 - mask) + donor_resized.astype(np.float32) * mask, 0, 255
     ).astype(np.uint8)
-    return out
+    
+    # Ground-truth binary mask (1 for spliced region, 0 elsewhere)
+    full_mask = np.zeros((h, w), dtype=np.uint8)
+    full_mask[dy:dy + ph, dx:dx + pw] = (mask[..., 0] > 0.1).astype(np.uint8)
+    return out, full_mask
 
 
 def add_timestamp(rgb: np.ndarray, text: str) -> np.ndarray:
@@ -339,16 +347,25 @@ def build(count_per_device: int, out_dir: Path) -> Path:
             captured = apply_camera(scene_rgb, device, seed)
             donors.append(cv2.resize(captured, (320, 240)))
 
+            masks_dir = out_dir / "masks"
+            masks_dir.mkdir(parents=True, exist_ok=True)
+
             def record(category: str, name: str, image: np.ndarray, quality: int,
-                       label: int, transformation: str) -> None:
+                       label: int, transformation: str, mask: Optional[np.ndarray] = None) -> None:
                 path = out_dir / category / f"{name}.jpg"
                 save_jpeg(path, image, quality)
+                mask_rel = ""
+                if mask is not None:
+                    mask_path = masks_dir / f"{name}_mask.png"
+                    Image.fromarray(mask.astype(np.uint8)).save(mask_path)
+                    mask_rel = str(mask_path.relative_to(out_dir))
                 rows.append(
                     {
                         "image_path": str(path.relative_to(out_dir)),
                         "path": str(path.relative_to(out_dir)),  # backwards-compatible alias
                         "category": category,
                         "label": label,
+                        "mask_path": mask_rel,
                         "manipulation_type": transformation,
                         "transformation": transformation,
                         "source_id": source_id,
@@ -378,21 +395,28 @@ def build(count_per_device: int, out_dir: Path) -> Path:
             stamped = add_timestamp(captured, "20/08/2026 14:32")
             record("timestamp_overlay", f"{source_id}_timestamp", stamped, device["jpeg"], 0, "timestamp_overlay")
 
-            cm = copy_move(captured, seed + 31)
-            record("copy_move", f"{source_id}_copy_move", cm, device["jpeg"], 1, "copy_move")
+            cm_img, cm_mask = copy_move(captured, seed + 31)
+            record("copy_move", f"{source_id}_copy_move", cm_img, device["jpeg"], 1, "copy_move", cm_mask)
 
             donor = donors[(len(donors) * 7) % len(donors)]
-            sp = splice(captured, donor, seed + 57)
-            record("splicing", f"{source_id}_splice", sp, device["jpeg"], 1, "splice")
+            sp_img, sp_mask = splice(captured, donor, seed + 57)
+            record("splicing", f"{source_id}_splice", sp_img, device["jpeg"], 1, "splice", sp_mask)
 
-            recompressed_source = cm if i % 2 == 0 else sp
+            if i % 2 == 0:
+                recomp_src, recomp_mask_src = cm_img, cm_mask
+            else:
+                recomp_src, recomp_mask_src = sp_img, sp_mask
+            
+            recomp_img = cv2.resize(recomp_src, None, fx=0.6, fy=0.6, interpolation=cv2.INTER_AREA)
+            recomp_mask = cv2.resize(recomp_mask_src, None, fx=0.6, fy=0.6, interpolation=cv2.INTER_NEAREST)
             record(
                 "manipulated_recompressed",
                 f"{source_id}_manip_recompressed",
-                cv2.resize(recompressed_source, None, fx=0.6, fy=0.6, interpolation=cv2.INTER_AREA),
+                recomp_img,
                 50,
                 1,
                 "manipulated_recompressed",
+                recomp_mask,
             )
 
     manifest_dir = out_dir / "manifests"
