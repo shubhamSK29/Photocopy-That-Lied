@@ -132,7 +132,8 @@ class ManipulationGenerator:
         if scale != 1.0:
             new_w = int(sw * scale)
             new_h = int(sh * scale)
-            source_patch = cv2.resize(source_patch, (new_w, new_h))
+            if new_w > 0 and new_h > 0:
+                source_patch = cv2.resize(source_patch, (new_w, new_h))
 
         # Paste at destination with optional blending
         dx, dy, dw, dh = dest_region
@@ -272,7 +273,8 @@ class ManipulationGenerator:
         if scale != 1.0:
             new_w = int(dw_donor * scale)
             new_h = int(dh_donor * scale)
-            donor_patch = cv2.resize(donor_patch, (new_w, new_h))
+            if new_w > 0 and new_h > 0:
+                donor_patch = cv2.resize(donor_patch, (new_w, new_h))
 
         # Destination region
         dx_dest, dy_dest, dw_dest, dh_dest = dest_region
@@ -378,7 +380,8 @@ class ManipulationGenerator:
         if scale != 1.0:
             new_w = int(dw * scale)
             new_h = int(dh * scale)
-            donor_patch = cv2.resize(donor_patch, (new_w, new_h))
+            if new_w > 0 and new_h > 0:
+                donor_patch = cv2.resize(donor_patch, (new_w, new_h))
 
         # Resize to fit target region if needed
         patch_h, patch_w = donor_patch.shape[:2]
