@@ -1,0 +1,38 @@
+[project]
+name = "photocopy-that-lied"
+version = "1.0.0"
+description = "AI-assisted image forensics for crop-insurance review"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi==0.141.1",
+    "uvicorn==0.53.0",
+    "python-multipart==0.0.32",
+    "pillow==12.3.0",
+    "numpy==2.2.6",
+    "scipy==1.15.3",
+    "opencv-python-headless==5.0.0.93",
+    "scikit-image==0.25.2",
+    "scikit-learn==1.7.2",
+    "joblib==1.6.0",
+    "pytesseract==0.3.13",
+    "weasyprint==63.1",
+    "streamlit==1.40.2",
+    "requests==2.32.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "httpx==0.28.1",
+    "pytest-cov==6.0.0",
+    "pytest-asyncio==0.25.3",
+]
+
+[tool.vercel]
+# Explicitly specify the FastAPI entrypoint for Vercel deployment
+# This prevents Vercel from mistakenly selecting test files as the entrypoint
+entrypoint = "backend.main:app"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
