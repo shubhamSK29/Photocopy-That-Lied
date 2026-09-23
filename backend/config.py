@@ -16,7 +16,7 @@ UPLOAD_DIR = _env_path("PTL_UPLOAD_DIR", BASE_DIR / "uploads")
 ARTIFACT_DIR = _env_path("PTL_ARTIFACT_DIR", BASE_DIR / "artifacts")
 REPORT_DIR = _env_path("PTL_REPORT_DIR", BASE_DIR / "reports")
 MODEL_DIR = _env_path("PTL_MODEL_DIR", BASE_DIR / "models")
-DATASET_DIR = _env_path("PTL_DATASET_DIR", BASE_DIR / "dataset")
+DATASET_DIR = _env_path("PTL_DATASET_DIR", BASE_DIR / "dataset_v2")
 DB_PATH = _env_path("PTL_DB_PATH", BASE_DIR / "analysis.db")
 
 for _d in (UPLOAD_DIR, ARTIFACT_DIR, REPORT_DIR, MODEL_DIR):
@@ -35,15 +35,18 @@ REVIEW_BAND_LOW = float(os.environ.get("PTL_BAND_LOW", "30"))
 REVIEW_BAND_HIGH = float(os.environ.get("PTL_BAND_HIGH", "60"))
 
 MODEL_VERSION_FALLBACK = "fusion-demo-fallback"
-DATASET_VERSION_FALLBACK = "dataset-unavailable"
+DATASET_VERSION_FALLBACK = "dataset-real-v1"
 FEATURE_VERSION = "features-v1"
 PIPELINE_VERSION = "pipeline-v1"
 
 MODEL_PATH = MODEL_DIR / "fusion_model.joblib"
 NATURAL_LIBRARY_PATH = MODEL_DIR / "natural_processing_library.json"
 
+# Dataset V2 model path (for future use when a better model is trained)
+DATASET_V2_MODEL_PATH = MODEL_DIR / "dataset_v2_model.joblib"
+
 CORS_ORIGINS = os.environ.get(
-    "PTL_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    "PTL_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,http://localhost:5175,http://127.0.0.1:5175,http://localhost:5176,http://127.0.0.1:5176,http://localhost:5177,http://127.0.0.1:5177,http://localhost:5178,http://127.0.0.1:5178"
 ).split(",")
 
 

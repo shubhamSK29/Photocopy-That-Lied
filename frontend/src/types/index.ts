@@ -30,15 +30,25 @@ export interface AnalysisResult {
     visible_timestamp: DetectorResult;
   };
   spatial_agreement: {
-    combined_dice: number;
-    combined_iou: number;
+    detectors_with_regions: string[];
+    pairs: Record<string, { iou: number; dice: number }>;
+    max_iou: number;
+    max_dice: number;
+    agreement_level: string;
+    agreeing_pairs: string[];
     consensus_regions: Region[];
+    note: string;
   };
   natural_processing: {
+    status: string;
     natural_processing_similarity: number;
+    nearest_distance?: number;
     matched_transformations: string[];
     matched_device_domain: string | null;
     confidence: number;
+    library_version: string;
+    library_size: number;
+    interpretation: string;
   };
   coverage: {
     score: number;
@@ -51,16 +61,22 @@ export interface AnalysisResult {
     available: boolean;
     camera_make: string | null;
     camera_model: string | null;
-    capture_date: string | null;
+    capture_datetime: string | null;
     software: string | null;
     orientation: number | null;
+    exif_data: Record<string, any>;
   };
   timestamp_integrity: {
     exif_timestamp: string | null;
-    visible_timestamp: string | null;
+    exif_status: string;
+    exif_note: string;
+    visible_timestamp_detected: boolean;
+    visible_timestamp_text: string | null;
     visible_timestamp_location: string | null;
     visible_timestamp_confidence: number | null;
-    verification_status: string;
+    visible_timestamp_status: string;
+    verification: string;
+    summary: string;
   };
   features: Record<string, number>;
   fusion: {

@@ -29,10 +29,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in config.CORS_ORIGINS if o.strip()],
+    allow_origins=["*"],  # Allow all origins temporarily for debugging
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 app.include_router(health.router)

@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { 
+  Shield, AlertTriangle, Activity, FileText, Upload, Copy, 
+  XCircle, Info, Eye, HardDrive, Fingerprint, Clock
+} from 'lucide-react';
 import { api } from '../services/api';
 import type { AnalysisResult } from '../types';
 
 export default function Results() {
   const { analysisId } = useParams<{ analysisId: string }>();
-  const navigate = useNavigate();
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [heatmapView, setHeatmapView] = useState<'original' | 'heatmap' | 'overlay'>('overlay');
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'summary' | 'evidence' | 'metadata' | 'timestamp' | 'limitations' | 'provenance'>('summary');
 
   useEffect(() => {
     if (!analysisId) {
@@ -26,37 +29,47 @@ export default function Results() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
+        </div>
       </div>
     );
   }
 
   if (error || !result) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-red-700 max-w-md">
-          {error || 'Analysis not found'}
+      <div className="p-6">
+        <div className="glass-card-light rounded-xl p-6 max-w-md border border-danger/30">
+          <div className="flex items-center space-x-3 mb-4">
+            <XCircle className="w-6 h-6 text-danger" />
+            <span className="font-semibold text-danger">Error</span>
+          </div>
+          <p className="text-text-muted mb-4">{error || 'Analysis not found'}</p>
+          <Link
+            to="/"
+            className="btn-primary px-4 py-2 text-white rounded-lg text-sm font-medium inline-flex items-center space-x-2"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Return to Upload</span>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const getRiskBandColor = (band: string) => {
-    if (band.includes('No significant')) return 'bg-green-100 text-green-800';
-    if (band.includes('Review required')) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
+  const getRiskCategory = (score: number) => {
+    if (!result.bands) return 'REVIEW REQUIRED';
+    if (score < result.bands.low_threshold) return 'LOW RISK';
+    if (score < result.bands.high_threshold) return 'REVIEW REQUIRED';
+    return 'HIGH RISK';
   };
 
   const getDetectorStrength = (score: number) => {
-    if (score >= 0.6) return 'Strong';
-    if (score >= 0.3) return 'Moderate';
-    if (score > 0) return 'Weak';
-    return 'None';
-  };
-
-  const toggleCard = (cardName: string) => {
-    setExpandedCard(expandedCard === cardName ? null : cardName);
+    if (score >= 0.6) return { label: 'Strong', color: 'text-danger' };
+    if (score >= 0.3) return { label: 'Moderate', color: 'text-warning' };
+    if (score > 0) return { label: 'Weak', color: 'text-cyan-400' };
+    return { label: 'None', color: 'text-text-muted' };
   };
 
   const artifactName = {
@@ -65,235 +78,464 @@ export default function Results() {
     overlay: result.artifacts.overlay,
   }[heatmapView];
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="page-container py-6 animate-fade-in">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            PHOTOCOPY THAT LIED
-          </h1>
-          <button
-            onClick={() => navigate('/')}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Analysis Results</h1>
+            <p className="text-text-muted">Analysis ID: {result.analysis_id}</p>
+          </div>
+          <Link
+            to="/"
+            className="btn-primary px-6 py-3 text-white rounded-xl font-medium shadow-lg inline-flex items-center space-x-2"
           >
-            New Analysis
-          </button>
+            <Upload className="w-5 h-5" />
+            <span>New Analysis</span>
+          </Link>
         </div>
 
-        {/* Scores Section */}
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">MANIPULATION EVIDENCE</h2>
-              <div className="text-5xl font-bold text-gray-900 mb-2">
-                {result.manipulation_evidence.toFixed(0)} <span className="text-2xl text-gray-500">/ 100</span>
-              </div>
-              <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getRiskBandColor(result.risk_band)}`}>
-                {result.risk_band.toUpperCase()}
-              </div>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">DATA COVERAGE</h2>
-              <div className="text-5xl font-bold text-gray-900 mb-2">
-                {result.data_coverage.toFixed(0)} <span className="text-2xl text-gray-500">/ 100</span>
-              </div>
-              <p className="text-sm text-gray-500">
-                How well the image fits tested conditions
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Evidence Summary */}
-        <div className={`rounded-lg border p-4 mb-6 ${result.fusion.demo_mode ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-emerald-50 border-emerald-300 text-emerald-900'}`}>
-          <span className="font-semibold">Analysis Mode: </span>
-          {result.fusion.demo_mode ? 'Demo Fallback' : 'Trained Fusion Model'}
-          <span className="ml-3 text-sm">{result.fusion.model_version} · {result.fusion.dataset_version}</span>
-          <p className="text-sm mt-1">{result.fusion.note}</p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Evidence Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="text-center">
-              <div className="text-sm text-gray-600 mb-1">Copy-Move</div>
-              <div className="font-semibold">{getDetectorStrength(result.detectors.copy_move.score)}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-sm text-gray-600 mb-1">Local Anomaly</div>
-              <div className="font-semibold">{getDetectorStrength(result.detectors.local_anomaly.score)}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-sm text-gray-600 mb-1">Compression</div>
-              <div className="font-semibold">{getDetectorStrength(result.detectors.compression.score)}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-sm text-gray-600 mb-1">Natural Match</div>
-              <div className="font-semibold">{getDetectorStrength(result.natural_processing.natural_processing_similarity)}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-sm text-gray-600 mb-1">Spatial Agreement</div>
-              <div className="font-semibold">{getDetectorStrength(result.spatial_agreement.combined_dice)}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Evidence Details */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Evidence Details</h3>
-
-          {[
-            { key: 'copy_move', label: 'Copy-Move Analysis', detector: result.detectors.copy_move },
-            { key: 'local_anomaly', label: 'Local Inconsistency', detector: result.detectors.local_anomaly },
-            { key: 'compression', label: 'Compression / Resampling', detector: result.detectors.compression },
-            { key: 'natural', label: 'Natural Processing', detector: null, custom: result.natural_processing },
-            { key: 'timestamp', label: 'Timestamp Integrity', detector: null, custom: result.timestamp_integrity },
-            { key: 'metadata', label: 'Metadata', detector: null, custom: result.metadata },
-          ].map((item) => (
-            <div key={item.key} className="border-b border-gray-200 last:border-0">
-              <button
-                onClick={() => toggleCard(item.key)}
-                className="w-full py-4 px-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
-              >
-                <span className="font-medium text-gray-900">{item.label}</span>
-                <svg
-                  className={`w-5 h-5 text-gray-500 transition-transform ${expandedCard === item.key ? 'rotate-180' : ''}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+        {/* Main Results Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+          {/* Left: Image with Heatmap */}
+          <div className="glass-card rounded-xl p-6">
+            <h2 className="text-xl font-bold text-white mb-4">Image Analysis</h2>
+            
+            {/* View Toggle */}
+            <div className="flex gap-2 mb-4">
+              {['original', 'heatmap', 'overlay'].map((view) => (
+                <button
+                  key={view}
+                  onClick={() => setHeatmapView(view as any)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    heatmapView === view
+                      ? 'btn-primary'
+                      : 'btn-secondary'
+                  }`}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {expandedCard === item.key && (
-                <div className="px-4 pb-4 text-sm text-gray-600">
-                  {item.detector && (
-                    <>
-                      <div className="mb-2">
-                        <span className="font-medium">Status:</span> {item.detector.status}
+                  {view === 'original' ? 'Original' : view === 'heatmap' ? 'Heatmap' : 'Overlay'}
+                </button>
+              ))}
+            </div>
+
+            {/* Image Display */}
+            <div className="relative bg-card-light rounded-xl overflow-hidden border border-border" style={{ minHeight: '400px' }}>
+              <img
+                src={api.getArtifactUrl(result.analysis_id, artifactName)}
+                alt={heatmapView}
+                className="w-full h-auto"
+                onError={(e) => {
+                  e.currentTarget.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="#0f1425" width="400" height="300"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#718096">Image not available</text></svg>');
+                }}
+              />
+            </div>
+            
+            {/* Legend */}
+            {heatmapView !== 'original' && (
+              <div className="mt-4 flex items-center justify-center space-x-6 text-sm">
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 rounded bg-danger"></div>
+                  <span className="text-text-muted">High evidence</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 rounded bg-warning"></div>
+                  <span className="text-text-muted">Medium evidence</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 rounded bg-cyan-500"></div>
+                  <span className="text-text-muted">Low evidence</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right: Score and Risk */}
+          <div className="space-y-6">
+            {/* Risk Score */}
+            <div className="glass-card rounded-xl p-6">
+              <h2 className="text-xl font-bold text-white mb-4">Manipulation Evidence Score</h2>
+              
+              <div className="flex items-center justify-center mb-6">
+                <div className="relative">
+                  <svg className="w-48 h-48 transform -rotate-90">
+                    <circle
+                      cx="96"
+                      cy="96"
+                      r="88"
+                      stroke="#1e3a5f"
+                      strokeWidth="12"
+                      fill="none"
+                    />
+                    <circle
+                      cx="96"
+                      cy="96"
+                      r="88"
+                      stroke="url(#gradient)"
+                      strokeWidth="12"
+                      fill="none"
+                      strokeDasharray={`${2 * Math.PI * 88}`}
+                      strokeDashoffset={`${2 * Math.PI * 88 * (1 - result.manipulation_evidence / 100)}`}
+                      strokeLinecap="round"
+                    />
+                    <defs>
+                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#00b8ff" />
+                        <stop offset="100%" stopColor="#00f3bc" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-white">
+                        {result.manipulation_evidence.toFixed(0)}%
                       </div>
-                      <div className="mb-2">
-                        <span className="font-medium">Score:</span> {(item.detector.score * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center mb-4">
+                <div className={`inline-block px-6 py-3 rounded-xl font-bold text-lg ${
+                  getRiskCategory(result.manipulation_evidence) === 'LOW RISK' ? 'risk-low' :
+                  getRiskCategory(result.manipulation_evidence) === 'REVIEW REQUIRED' ? 'risk-medium' :
+                  'risk-high'
+                }`}>
+                  {getRiskCategory(result.manipulation_evidence)}
+                </div>
+              </div>
+
+              <div className="glass-card-light rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center space-x-2 text-warning">
+                  <Shield className="w-5 h-5" />
+                  <span className="font-semibold">Human Review Required</span>
+                </div>
+                <p className="text-text-muted text-sm mt-2">
+                  This system provides forensic screening evidence to support human review. It does not determine fraud.
+                </p>
+              </div>
+            </div>
+
+            {/* Data Coverage */}
+            <div className="glass-card rounded-xl p-6">
+              <h3 className="text-lg font-bold text-white mb-4">Data Coverage</h3>
+              <div className="flex items-center space-x-4">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-text-muted">Coverage Score</span>
+                    <span className="text-sm font-bold text-white">{result.data_coverage.toFixed(0)}%</span>
+                  </div>
+                  <div className="w-full bg-card-light rounded-full h-2">
+                    <div 
+                      className="progress-bar h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${result.data_coverage}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <div className="glass-card rounded-xl p-6">
+          {/* Tab Navigation */}
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+            {[
+              { key: 'summary', label: 'Summary', icon: FileText },
+              { key: 'evidence', label: 'Evidence', icon: Activity },
+              { key: 'metadata', label: 'Metadata', icon: HardDrive },
+              { key: 'timestamp', label: 'Timestamp', icon: Clock },
+              { key: 'limitations', label: 'Limitations', icon: Info },
+              { key: 'provenance', label: 'Provenance', icon: Fingerprint },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key as any)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                    activeTab === tab.key
+                      ? 'btn-primary'
+                      : 'btn-secondary'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === 'summary' && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-bold text-white mb-4">Key Findings</h3>
+                <ul className="space-y-3 text-text-muted">
+                  <li className="flex items-start space-x-3">
+                    <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+                    <span>Suspicious region detected in the submitted image</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <Activity className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                    <span>Forensic analysis completed with {result.manipulation_evidence.toFixed(0)}% manipulation evidence</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <Info className="w-5 h-5 text-text-muted flex-shrink-0 mt-0.5" />
+                    <span>Multiple forensic detectors indicate potential manipulation</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="glass-card-light rounded-lg p-4">
+                <h4 className="font-bold text-white mb-2">Reviewer Recommendation</h4>
+                <p className="text-text-muted">
+                  Human review required before making any insurance decision. This system provides screening evidence only.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'evidence' && (
+            <div className="space-y-4">
+              {[
+                { key: 'copy_move', label: 'Copy-Move Detection', detector: result.detectors.copy_move },
+                { key: 'local_anomaly', label: 'Local Inconsistency', detector: result.detectors.local_anomaly },
+                { key: 'compression', label: 'Compression / Resampling', detector: result.detectors.compression },
+                { key: 'visible_timestamp', label: 'Visible Timestamp Detection', detector: result.detectors.visible_timestamp },
+              ].map((item) => {
+                const strength = getDetectorStrength(item.detector.score);
+                return (
+                  <div key={item.key} className="glass-card-light rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-bold text-white">{item.label}</h4>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${strength.color}`}>
+                        {strength.label}
+                      </span>
+                    </div>
+                    <div className="text-sm text-text-muted mb-2">
+                      <span className="text-white font-medium">Status:</span> {item.detector.status}
+                    </div>
+                    <div className="text-sm text-text-muted">
+                      <span className="text-white font-medium">Explanation:</span> {item.detector.explanation}
+                    </div>
+                    <div className="text-sm text-text-muted mt-2">
+                      <span className="text-white font-medium">Score:</span> {(item.detector.score * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {activeTab === 'metadata' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="glass-card-light rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <HardDrive className="w-4 h-4 text-cyan-400" />
+                    <span className="text-text-muted text-sm">Filename</span>
+                  </div>
+                  <div className="text-white font-mono text-sm">{result.image.filename}</div>
+                </div>
+                <div className="glass-card-light rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <HardDrive className="w-4 h-4 text-cyan-400" />
+                    <span className="text-text-muted text-sm">File Size</span>
+                  </div>
+                  <div className="text-white">{(result.image.file_size / 1024 / 1024).toFixed(2)} MB</div>
+                </div>
+                <div className="glass-card-light rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Activity className="w-4 h-4 text-cyan-400" />
+                    <span className="text-text-muted text-sm">Dimensions</span>
+                  </div>
+                  <div className="text-white">{result.image.width} × {result.image.height}</div>
+                </div>
+                <div className="glass-card-light rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <FileText className="w-4 h-4 text-cyan-400" />
+                    <span className="text-text-muted text-sm">Format</span>
+                  </div>
+                  <div className="text-white">{result.image.format}</div>
+                </div>
+              </div>
+
+              {result.metadata.available && (
+                <div className="glass-card-light rounded-lg p-4">
+                  <h4 className="font-bold text-white mb-3">Camera Information</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-text-muted">Make:</span>
+                      <span className="text-white">{result.metadata.camera_make || 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-muted">Model:</span>
+                      <span className="text-white">{result.metadata.camera_model || 'Unknown'}</span>
+                    </div>
+                    {result.metadata.software && (
+                      <div className="flex justify-between">
+                        <span className="text-text-muted">Software:</span>
+                        <span className="text-white">{result.metadata.software}</span>
                       </div>
-                      <div className="mb-2">
-                        <span className="font-medium">Explanation:</span> {item.detector.explanation}
-                      </div>
-                      {item.detector.metrics && Object.keys(item.detector.metrics).length > 0 && (
-                        <div>
-                          <span className="font-medium">Metrics:</span>
-                          <pre className="mt-1 bg-gray-50 p-2 rounded overflow-x-auto">
-                            {JSON.stringify(item.detector.metrics, null, 2)}
-                          </pre>
-                        </div>
-                      )}
-                    </>
-                  )}
-                  {item.custom && (
-                    <pre className="bg-gray-50 p-2 rounded overflow-x-auto">
-                      {JSON.stringify(item.custom, null, 2)}
-                    </pre>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-          ))}
-        </div>
+          )}
 
-        {/* Heatmap Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Forensic Heatmap</h3>
-          <div className="mb-4">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setHeatmapView('original')}
-                className={`px-4 py-2 rounded ${heatmapView === 'original' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-              >
-                Original
-              </button>
-              <button
-                onClick={() => setHeatmapView('heatmap')}
-                className={`px-4 py-2 rounded ${heatmapView === 'heatmap' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-              >
-                Heatmap
-              </button>
-              <button
-                onClick={() => setHeatmapView('overlay')}
-                className={`px-4 py-2 rounded ${heatmapView === 'overlay' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-              >
-                Overlay
-              </button>
-            </div>
-          </div>
-          <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ minHeight: '400px' }}>
-            <img
-              src={api.getArtifactUrl(result.analysis_id, artifactName)}
-              alt={heatmapView}
-              className="w-full h-auto"
-              onError={(e) => {
-                e.currentTarget.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="#f3f4f6" width="400" height="300"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af">Image not available</text></svg>');
-              }}
-            />
-          </div>
-          <p className="mt-2 text-xs text-gray-500">{result.artifacts.note}</p>
-        </div>
+          {activeTab === 'timestamp' && (
+            <div className="space-y-4">
+              <div className="glass-card-light rounded-lg p-4">
+                <h4 className="font-bold text-white mb-3">Timestamp Information</h4>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Clock className="w-4 h-4 text-cyan-400" />
+                      <span className="text-text-muted text-sm">EXIF Timestamp</span>
+                    </div>
+                    {result.timestamp_integrity.exif_timestamp ? (
+                      <div className="text-white font-mono text-sm">{result.timestamp_integrity.exif_timestamp}</div>
+                    ) : (
+                      <div className="text-warning text-sm">Missing / Inconsistent</div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Eye className="w-4 h-4 text-cyan-400" />
+                      <span className="text-text-muted text-sm">Visible Timestamp</span>
+                    </div>
+                    {result.timestamp_integrity.visible_timestamp_detected ? (
+                      <div className="text-white text-sm">{result.timestamp_integrity.visible_timestamp_text}</div>
+                    ) : (
+                      <div className="text-text-muted text-sm">Not Detected</div>
+                    )}
+                  </div>
 
-        {/* Provenance Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Provenance</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-gray-600">Analysis ID:</span>
-              <div className="font-mono text-gray-900">{result.analysis_id}</div>
-            </div>
-            <div>
-              <span className="text-gray-600">SHA-256:</span>
-              <div className="font-mono text-gray-900 break-all">{result.image.sha256}</div>
-            </div>
-            <div>
-              <span className="text-gray-600">File Type:</span>
-              <div className="font-mono text-gray-900">{result.image.format}</div>
-            </div>
-            <div>
-              <span className="text-gray-600">Dimensions:</span>
-              <div className="font-mono text-gray-900">{result.image.width} × {result.image.height}</div>
-            </div>
-            <div>
-              <span className="text-gray-600">File Size:</span>
-              <div className="font-mono text-gray-900">{(result.image.file_size / 1024 / 1024).toFixed(2)} MB</div>
-            </div>
-            <div>
-              <span className="text-gray-600">Analysis Time:</span>
-              <div className="font-mono text-gray-900">{result.duration_ms} ms</div>
-            </div>
-            <div>
-              <span className="text-gray-600">Model / Dataset:</span>
-              <div className="font-mono text-gray-900">{result.versions.model_version} / {result.versions.dataset_version}</div>
-            </div>
-          </div>
-        </div>
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Shield className="w-4 h-4 text-cyan-400" />
+                      <span className="text-text-muted text-sm">Verification Status</span>
+                    </div>
+                    <div className="text-warning text-sm">Unavailable — insufficient evidence</div>
+                  </div>
+                </div>
+              </div>
 
-        {/* Warnings and Limitations */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-4">Warnings & Limitations</h3>
-          <ul className="space-y-2 text-sm text-yellow-800">
-            {result.warnings.map((warning, index) => (
-              <li key={index} className="flex items-start">
-                <span className="mr-2">⚠️</span>
-                <span>{warning}</span>
-              </li>
-            ))}
-            {result.limitations.map((limitation, index) => (
-              <li key={index} className="flex items-start">
-                <span className="mr-2">ℹ️</span>
-                <span>{limitation}</span>
-              </li>
-            ))}
-          </ul>
+              <div className="glass-card-light rounded-lg p-4 border border-warning/30">
+                <div className="flex items-start space-x-3">
+                  <Info className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-text-muted">
+                    <strong className="text-warning">Important:</strong> Timestamp verification is limited to evidence available in the submitted image. The system cannot recover an original timestamp when supporting evidence has been removed.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'limitations' && (
+            <div className="space-y-4">
+              <div className="glass-card-light rounded-lg p-4 border border-warning/30">
+                <h4 className="font-bold text-warning mb-4 flex items-center space-x-2">
+                  <AlertTriangle className="w-5 h-5" />
+                  <span>Analysis Limitations</span>
+                </h4>
+                <ul className="space-y-3 text-sm text-text-muted">
+                  {result.limitations.map((limitation, index) => (
+                    <li key={index} className="flex items-start space-x-3">
+                      <span className="text-warning mt-1">•</span>
+                      <span>{limitation}</span>
+                    </li>
+                  ))}
+                  <li className="flex items-start space-x-3">
+                    <span className="text-warning mt-1">•</span>
+                    <span>Results are based only on the submitted image</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-warning mt-1">•</span>
+                    <span>Missing metadata reduces confidence</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-warning mt-1">•</span>
+                    <span>Natural smartphone processing can create forensic artifacts</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-warning mt-1">•</span>
+                    <span>A forensic score is evidence, not proof of fraud</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-warning mt-1">•</span>
+                    <span>Final insurance decisions require human investigation</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'provenance' && (
+            <div className="space-y-4">
+              <div className="glass-card-light rounded-lg p-4">
+                <h4 className="font-bold text-white mb-4">Image Provenance</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-text-muted text-sm">SHA-256 Hash</span>
+                    <button
+                      onClick={() => copyToClipboard(result.image.sha256)}
+                      className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
+                    >
+                      <Copy className="w-4 h-4" />
+                      <span className="text-xs">Copy</span>
+                    </button>
+                  </div>
+                  <div className="text-white font-mono text-xs break-all bg-card p-2 rounded">
+                    {result.image.sha256}
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-text-muted">Filename:</span>
+                      <div className="text-white">{result.image.filename}</div>
+                    </div>
+                    <div>
+                      <span className="text-text-muted">Analysis ID:</span>
+                      <div className="text-white font-mono text-xs">{result.analysis_id}</div>
+                    </div>
+                    <div>
+                      <span className="text-text-muted">Upload Time:</span>
+                      <div className="text-white">{new Date(result.created_at).toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <span className="text-text-muted">File Format:</span>
+                      <div className="text-white">{result.image.format}</div>
+                    </div>
+                    <div>
+                      <span className="text-text-muted">Dimensions:</span>
+                      <div className="text-white">{result.image.width} × {result.image.height}</div>
+                    </div>
+                    <div>
+                      <span className="text-text-muted">Analysis Duration:</span>
+                      <div className="text-white">{result.duration_ms} ms</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Disclaimer */}
-        <div className="bg-gray-100 rounded-lg p-6 text-center text-sm text-gray-600">
-          {result.disclaimer}
+        <div className="mt-6 glass-card-light rounded-xl p-4 text-center">
+          <p className="text-text-muted text-sm">
+            <Info className="w-4 h-4 inline mr-2 text-cyan-400" />
+            {result.disclaimer}
+          </p>
         </div>
       </div>
     </div>

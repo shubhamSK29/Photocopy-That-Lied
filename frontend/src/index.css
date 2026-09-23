@@ -2,7 +2,239 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+@layer base {
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #0a0e1a;
+    color: #ffffff;
+  }
+  
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1e3a5f #0a0e1a;
+  }
+  
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: #0a0e1a;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: #1e3a5f;
+    border-radius: 4px;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background: #2a4a7f;
+  }
+}
+
+@layer components {
+  /* Glassmorphism effects */
+  .glass-card {
+    background: linear-gradient(135deg, rgba(15, 20, 37, 0.8) 0%, rgba(26, 33, 64, 0.6) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 184, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  .glass-card-light {
+    background: linear-gradient(135deg, rgba(20, 26, 47, 0.9) 0%, rgba(26, 33, 64, 0.7) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 184, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Gradient backgrounds */
+  .gradient-cyan {
+    background: linear-gradient(135deg, #00b8ff 0%, #0099cc 100%);
+  }
+  
+  .gradient-teal {
+    background: linear-gradient(135deg, #00f3bc 0%, #00c297 100%);
+  }
+  
+  .gradient-danger {
+    background: linear-gradient(135deg, #ff3366 0%, #cc2952 100%);
+  }
+  
+  .gradient-warning {
+    background: linear-gradient(135deg, #ffaa00 0%, #cc8800 100%);
+  }
+  
+  /* Gradient text */
+  .gradient-text-cyan {
+    background: linear-gradient(135deg, #00b8ff 0%, #00f3bc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Glowing effects */
+  .glow-cyan {
+    box-shadow: 0 0 15px rgba(0, 184, 255, 0.5), 0 0 30px rgba(0, 184, 255, 0.3);
+  }
+  
+  .glow-teal {
+    box-shadow: 0 0 15px rgba(0, 243, 188, 0.5), 0 0 30px rgba(0, 243, 188, 0.3);
+  }
+  
+  .glow-danger {
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.5), 0 0 30px rgba(255, 51, 102, 0.3);
+  }
+  
+  /* Button styles */
+  .btn-primary {
+    background: linear-gradient(135deg, #00b8ff 0%, #0099cc 100%);
+    color: white;
+    border: 1px solid rgba(0, 184, 255, 0.3);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 184, 255, 0.3);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 184, 255, 0.5);
+  }
+  
+  .btn-secondary {
+    background: linear-gradient(135deg, rgba(30, 58, 95, 0.8) 0%, rgba(42, 74, 127, 0.6) 100%);
+    color: white;
+    border: 1px solid rgba(0, 184, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 184, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 184, 255, 0.2);
+  }
+  
+  /* Upload zone */
+  .upload-zone {
+    background: linear-gradient(135deg, rgba(15, 20, 37, 0.6) 0%, rgba(26, 33, 64, 0.4) 100%);
+    border: 2px dashed rgba(0, 184, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .upload-zone:hover {
+    border-color: rgba(0, 184, 255, 0.6);
+    background: linear-gradient(135deg, rgba(15, 20, 37, 0.8) 0%, rgba(26, 33, 64, 0.6) 100%);
+  }
+  
+  .upload-zone.dragging {
+    border-color: #00b8ff;
+    background: linear-gradient(135deg, rgba(0, 184, 255, 0.1) 0%, rgba(0, 243, 188, 0.05) 100%);
+    transform: scale(1.02);
+  }
+  
+  /* Sidebar */
+  .sidebar-item {
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-item:hover {
+    transform: translateX(4px);
+    background: rgba(0, 184, 255, 0.1);
+  }
+  
+  .sidebar-item.active {
+    background: linear-gradient(135deg, rgba(0, 184, 255, 0.2) 0%, rgba(0, 243, 188, 0.1) 100%);
+    border-left: 3px solid #00b8ff;
+  }
+  
+  /* Risk indicators */
+  .risk-low {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 204, 106, 0.1) 100%);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    color: #00ff88;
+  }
+  
+  .risk-medium {
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.2) 0%, rgba(204, 136, 0, 0.1) 100%);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    color: #ffaa00;
+  }
+  
+  .risk-high {
+    background: linear-gradient(135deg, rgba(255, 51, 102, 0.2) 0%, rgba(204, 41, 82, 0.1) 100%);
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    color: #ff3366;
+  }
+  
+  /* Status badges */
+  .status-live {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 204, 106, 0.1) 100%);
+    border: 1px solid rgba(0, 255, 136, 0.4);
+    color: #00ff88;
+    animation: glow 2s ease-in-out infinite;
+  }
+  
+  /* Progress bar */
+  .progress-bar {
+    background: linear-gradient(90deg, #00b8ff 0%, #00f3bc 100%);
+    box-shadow: 0 0 10px rgba(0, 184, 255, 0.5);
+  }
+  
+  /* Table styles */
+  .table-row {
+    transition: all 0.2s ease;
+  }
+  
+  .table-row:hover {
+    background: rgba(0, 184, 255, 0.05);
+  }
+  
+  /* Input styles */
+  .input-forensic {
+    background: rgba(15, 20, 37, 0.8);
+    border: 1px solid rgba(0, 184, 255, 0.2);
+    color: white;
+    transition: all 0.3s ease;
+  }
+  
+  .input-forensic:focus {
+    border-color: #00b8ff;
+    box-shadow: 0 0 10px rgba(0, 184, 255, 0.3);
+    outline: none;
+  }
+  
+  /* Card hover effects */
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 184, 255, 0.2);
+    border-color: rgba(0, 184, 255, 0.3);
+  }
+
+  /* Global Page Container */
+  .page-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  @media (max-width: 1024px) {
+    .page-container {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .page-container {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
 }

@@ -173,6 +173,62 @@ def audit_metadata_leakage(rows: List[Dict], splits: Dict[str, List[str]]) -> Di
     return results
 
 
+def audit_donor_target_leakage(rows: List[Dict], splits: Dict[str, List[str]]) -> Dict:
+    """Check for donor-target leakage in cross-image manipulations."""
+    results = {
+        "donor_target_leakage": [],
+        "status": "PASS"
+    }
+    
+    # Build image_id to split mapping
+    image_to_split = {}
+    for split_name, image_ids in splits.items():
+        for img_id in image_ids:
+            image_to_split[img_id] = split_name
+    
+    # Build source_id to split mapping
+    source_to_split = {}
+    for row in rows:
+        source_id = row.get("source_id")
+        image_id = row.get("image_id")
+        if source_id and image_id in image_to_split:
+            if source_id not in source_to_split:
+                source_to_split[source_id] = image_to_split[image_id]
+            elif source_to_split[source_id] != image_to_split[image_id]:
+                # Source in multiple splits - this should not happen
+                results["donor_target_leakage"].append({
+                    "type": "source_multiple_splits",
+                    "source_id": source_id,
+                    "splits": [source_to_split[source_id], image_to_split[image_id]]
+                })
+    
+    # Check donor-target split safety for insertion and splicing
+    for row in rows:
+        if row.get("category") in ["object_insertion", "splicing"]:
+            params = row.get("parameters", {})
+            donor_source_id = params.get("donor_source_id")
+            target_source_id = row.get("source_id")
+            
+            if donor_source_id and target_source_id:
+                donor_split = source_to_split.get(donor_source_id)
+                target_split = source_to_split.get(target_source_id)
+                
+                if donor_split and target_split and donor_split != target_split:
+                    results["donor_target_leakage"].append({
+                        "type": "donor_target_split_mismatch",
+                        "image_id": row.get("image_id"),
+                        "donor_source_id": donor_source_id,
+                        "target_source_id": target_source_id,
+                        "donor_split": donor_split,
+                        "target_split": target_split
+                    })
+    
+    if results["donor_target_leakage"]:
+        results["status"] = "FAIL"
+    
+    return results
+
+
 def print_report(results: Dict):
     """Print leakage audit report."""
     print("=" * 80)
@@ -187,22 +243,33 @@ def print_report(results: Dict):
         print(f"  {split}: {dist['images']} images, {dist['sources']} sources")
     
     if results['source_leakage']['source_leakage']:
-        print(f"\n❌ Source leakage detected:")
+        print(f"\n[X] Source leakage detected:")
         for leak in results['source_leakage']['source_leakage']:
             print(f"  {leak['type']}: {leak['sources']}")
     else:
-        print(f"\n✅ No source leakage detected")
+        print(f"\n[OK] No source leakage detected")
     
     # Duplicate leakage
     print("\n[DUPLICATE LEAKAGE]")
     print(f"Status: {results['duplicate_leakage']['status']}")
     
     if results['duplicate_leakage']['duplicate_leakage']:
-        print(f"\n❌ Duplicate leakage detected:")
+        print(f"\n[X] Duplicate leakage detected:")
         for leak in results['duplicate_leakage']['duplicate_leakage']:
             print(f"  {leak['type']}: {leak['image_ids']}")
     else:
-        print(f"\n✅ No duplicate leakage detected")
+        print(f"\n[OK] No duplicate leakage detected")
+    
+    # Donor-target leakage
+    print("\n[DONOR-TARGET LEAKAGE]")
+    print(f"Status: {results['donor_target_leakage']['status']}")
+    
+    if results['donor_target_leakage']['donor_target_leakage']:
+        print(f"\n[X] Donor-target leakage detected:")
+        for leak in results['donor_target_leakage']['donor_target_leakage']:
+            print(f"  {leak}")
+    else:
+        print(f"\n[OK] No donor-target leakage detected")
     
     # Metadata leakage
     print("\n[METADATA LEAKAGE]")
@@ -210,11 +277,11 @@ def print_report(results: Dict):
         print(f"  {split}: {counts['genuine']} genuine ({counts['genuine_percentage']:.1%}), {counts['manipulated']} manipulated")
     
     if results['metadata_leakage']['potential_leakage']:
-        print(f"\n⚠️  Potential metadata leakage:")
+        print(f"\n[WARNING] Potential metadata leakage:")
         for leak in results['metadata_leakage']['potential_leakage']:
             print(f"  {leak}")
     else:
-        print(f"\n✅ No obvious metadata leakage")
+        print(f"\n[OK] No obvious metadata leakage")
     
     print("\n" + "=" * 80)
 
@@ -232,13 +299,14 @@ def main():
     results = {
         "source_leakage": audit_source_leakage(rows, splits),
         "duplicate_leakage": audit_duplicate_leakage(rows, splits),
+        "donor_target_leakage": audit_donor_target_leakage(rows, splits),
         "metadata_leakage": audit_metadata_leakage(rows, splits)
     }
     
     print_report(results)
     
     # Save report
-    report_file = ROOT / "reports" / "PHASE_2_LEAKAGE_AUDIT.json"
+    report_file = ROOT / "reports" / "PHASE_18_LEAKAGE_AUDIT.json"
     report_file.parent.mkdir(exist_ok=True)
     with report_file.open("w") as f:
         json.dump(results, f, indent=2)
@@ -248,14 +316,15 @@ def main():
     # Overall status
     has_leakage = (
         results['source_leakage']['status'] == "FAIL" or
-        results['duplicate_leakage']['status'] == "FAIL"
+        results['duplicate_leakage']['status'] == "FAIL" or
+        results['donor_target_leakage']['status'] == "FAIL"
     )
     
     if has_leakage:
-        print("\n❌ LEAKAGE AUDIT FAILED")
+        print("\n[X] LEAKAGE AUDIT FAILED")
         return 1
     else:
-        print("\n✅ LEAKAGE AUDIT PASSED")
+        print("\n[OK] LEAKAGE AUDIT PASSED")
         return 0
 
 

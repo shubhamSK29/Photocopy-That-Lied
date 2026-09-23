@@ -45,3 +45,6 @@ models/*.json
 # OS
 .DS_Store
 Thumbs.db
+dataset_v2/
+
+nul

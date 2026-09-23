@@ -1,0 +1,133 @@
+MANUAL QC SAMPLE LIST
+================================================================================
+
+ORIGINAL IMAGES:
+  SRC_DW_42B3777910D24768: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171109-193756-1.jpg
+  SRC_DW_9CFFFFF1744F8A16: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170913-124937-1.jpg
+  SRC_DW_CEA321004028901C: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171205-124539-2.jpg
+  SRC_DW_8786F0C0FBF0D0BB: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171220-094530-2.jpg
+  SRC_DW_3A1D7141FC2861BA: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170913-124346-1.jpg
+
+NATURAL-PROCESSING IMAGES:
+  SRC_DW_D4C6276E8DC7CA74_NP_GAMMA_72f2695e95d7f3f5: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\natural_processing\SRC_DW_D4C6276E8DC7CA74_NP_GAMMA_72f2695e95d7f3f5.jpg
+  SRC_DW_42B5E565AE51D6DC_NP_DENOISE_535b80b54a2963a4: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\natural_processing\SRC_DW_42B5E565AE51D6DC_NP_DENOISE_535b80b54a2963a4.jpg
+  SRC_DW_7CCEE6E0F6EDB22E_NP_GAMMA_8240d187434605c3: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\natural_processing\SRC_DW_7CCEE6E0F6EDB22E_NP_GAMMA_8240d187434605c3.jpg
+  SRC_DW_4A4AC282EF66C0A6_NP_SHARPEN_d2c9e9d8a3b72934: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\natural_processing\SRC_DW_4A4AC282EF66C0A6_NP_SHARPEN_d2c9e9d8a3b72934.jpg
+  SRC_DW_D7DDC469324C5BFD_NP_FORMAT_CONVERSION_32f4d8727b4e4ffc: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\natural_processing\SRC_DW_D7DDC469324C5BFD_NP_FORMAT_CONVERSION_32f4d8727b4e4ffc.jpg
+
+HARD-NEGATIVE IMAGES:
+  SRC_DW_03E50FF738AA1B03_HN_JPEG_RECOMPRESSION_1d41219b05c78836: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\hard_negative\SRC_DW_03E50FF738AA1B03_HN_JPEG_RECOMPRESSION_1d41219b05c78836.jpg
+  SRC_DW_A86935E0145BA56B_HN_GAMMA_64c5a5c6de6249be: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\hard_negative\SRC_DW_A86935E0145BA56B_HN_GAMMA_64c5a5c6de6249be.jpg
+  SRC_DW_78BD3C1E15A20062_HN_JPEG_RECOMPRESSION_086d1670bc061e4f: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\hard_negative\SRC_DW_78BD3C1E15A20062_HN_JPEG_RECOMPRESSION_086d1670bc061e4f.jpg
+  SRC_DW_9A14DBDF719D4430_HN_DENOISE_002919e35fb8de27: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\hard_negative\SRC_DW_9A14DBDF719D4430_HN_DENOISE_002919e35fb8de27.jpg
+  SRC_DW_9A14DBDF719D4430_HN_RESIZE_f4c7998b154e8df1: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\hard_negative\SRC_DW_9A14DBDF719D4430_HN_RESIZE_f4c7998b154e8df1.jpg
+
+MANIPULATED IMAGES:
+
+COPY_MOVE:
+  SRC_DW_AFB187CC4AA4C45C_M_COPY_MOVE_ab439a585d7f3df1:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170718-132127-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_AFB187CC4AA4C45C_M_COPY_MOVE_ab439a585d7f3df1.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_AFB187CC4AA4C45C_M_COPY_MOVE_ab439a585d7f3df1_mask.png
+    Area ratio: 0.0625
+  SRC_DW_D935BF546A6E6716_M_COPY_MOVE_06a86bdbb9c082c1:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170920-191121-1.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_D935BF546A6E6716_M_COPY_MOVE_06a86bdbb9c082c1.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_D935BF546A6E6716_M_COPY_MOVE_06a86bdbb9c082c1_mask.png
+    Area ratio: 0.00152587890625
+  SRC_DW_E33682417B480556_M_COPY_MOVE_00f0655d5ff27bb9:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20180105-092349-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_E33682417B480556_M_COPY_MOVE_00f0655d5ff27bb9.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_E33682417B480556_M_COPY_MOVE_00f0655d5ff27bb9_mask.png
+    Area ratio: 0.0111236572265625
+  SRC_DW_742D7258F9785FFA_M_COPY_MOVE_e1ff951bf4c3bbdb:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171109-093041-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_742D7258F9785FFA_M_COPY_MOVE_e1ff951bf4c3bbdb.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_742D7258F9785FFA_M_COPY_MOVE_e1ff951bf4c3bbdb_mask.png
+    Area ratio: 0.0256500244140625
+  SRC_DW_33E8D823F87A94AB_M_COPY_MOVE_8904192025bd498e:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171113-133259-3.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_33E8D823F87A94AB_M_COPY_MOVE_8904192025bd498e.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_33E8D823F87A94AB_M_COPY_MOVE_8904192025bd498e_mask.png
+    Area ratio: 0.088134765625
+
+OBJECT_REMOVAL:
+  SRC_DW_6C1F002ABF308E01_M_OBJECT_REMOVAL_d2a6018ec3c5c27c:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170727-150146-3.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_6C1F002ABF308E01_M_OBJECT_REMOVAL_d2a6018ec3c5c27c.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_6C1F002ABF308E01_M_OBJECT_REMOVAL_d2a6018ec3c5c27c_mask.png
+    Area ratio: 0.006103515625
+  SRC_DW_41F23A41D7645180_M_OBJECT_REMOVAL_53c274ea75a3a20c:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20180322-103028-1.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_41F23A41D7645180_M_OBJECT_REMOVAL_53c274ea75a3a20c.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_41F23A41D7645180_M_OBJECT_REMOVAL_53c274ea75a3a20c_mask.png
+    Area ratio: 0.01373291015625
+  SRC_DW_FEC420CB9A8BB7A1_M_OBJECT_REMOVAL_ddec50b98a1c6fdb:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20180119-110921-1.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_FEC420CB9A8BB7A1_M_OBJECT_REMOVAL_ddec50b98a1c6fdb.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_FEC420CB9A8BB7A1_M_OBJECT_REMOVAL_ddec50b98a1c6fdb_mask.png
+    Area ratio: 0.0625
+  SRC_DW_742D7258F9785FFA_M_OBJECT_REMOVAL_c3eaa7781cf51003:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171109-093041-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_742D7258F9785FFA_M_OBJECT_REMOVAL_c3eaa7781cf51003.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_742D7258F9785FFA_M_OBJECT_REMOVAL_c3eaa7781cf51003_mask.png
+    Area ratio: 0.0625
+  SRC_DW_0E2CF3CBC45332F1_M_OBJECT_REMOVAL_b006dc3977fadf57:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170610-122424-0.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_0E2CF3CBC45332F1_M_OBJECT_REMOVAL_b006dc3977fadf57.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_0E2CF3CBC45332F1_M_OBJECT_REMOVAL_b006dc3977fadf57_mask.png
+    Area ratio: 0.0396881103515625
+
+OBJECT_INSERTION:
+  SRC_DW_D35996DEA6907BC8_M_OBJECT_INSERTION_03cea4b426335115:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171102-102154-1.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_D35996DEA6907BC8_M_OBJECT_INSERTION_03cea4b426335115.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_D35996DEA6907BC8_M_OBJECT_INSERTION_03cea4b426335115_mask.png
+    Area ratio: 0.06646728515625
+  SRC_DW_A75C10B172DBD748_M_OBJECT_INSERTION_c542063e388d4cef:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171220-084200-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_A75C10B172DBD748_M_OBJECT_INSERTION_c542063e388d4cef.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_A75C10B172DBD748_M_OBJECT_INSERTION_c542063e388d4cef_mask.png
+    Area ratio: 0.0256500244140625
+  SRC_DW_143EC9C09AEA746D_M_OBJECT_INSERTION_77d61ed0532fea87:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170727-171655-1.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_143EC9C09AEA746D_M_OBJECT_INSERTION_77d61ed0532fea87.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_143EC9C09AEA746D_M_OBJECT_INSERTION_77d61ed0532fea87_mask.png
+    Area ratio: 0.36187744140625
+  SRC_DW_E09E0E5BE5C4A5D4_M_OBJECT_INSERTION_8db93783930ef91b:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170718-132427-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_E09E0E5BE5C4A5D4_M_OBJECT_INSERTION_8db93783930ef91b.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_E09E0E5BE5C4A5D4_M_OBJECT_INSERTION_8db93783930ef91b_mask.png
+    Area ratio: 0.0308990478515625
+  SRC_DW_5848622ADA5BFA07_M_OBJECT_INSERTION_0d8231fcfcc56ca4:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171205-124014-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_5848622ADA5BFA07_M_OBJECT_INSERTION_0d8231fcfcc56ca4.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_5848622ADA5BFA07_M_OBJECT_INSERTION_0d8231fcfcc56ca4_mask.png
+    Area ratio: 0.01373291015625
+
+SPLICING:
+  SRC_DW_8287B54F129B68F1_M_SPLICING_2a0effabd2c0e652:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20180109-071852-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_8287B54F129B68F1_M_SPLICING_2a0effabd2c0e652.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_8287B54F129B68F1_M_SPLICING_2a0effabd2c0e652_mask.png
+    Area ratio: 0.0095367431640625
+  SRC_DW_A75C10B172DBD748_M_SPLICING_d4ca004198474e9c:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171220-084200-2.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_A75C10B172DBD748_M_SPLICING_d4ca004198474e9c.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_A75C10B172DBD748_M_SPLICING_d4ca004198474e9c_mask.png
+    Area ratio: 0.0095367431640625
+  SRC_DW_E2E45BB672622C23_M_SPLICING_d1c3abdb2ec5518b:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170501-144625-0.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_E2E45BB672622C23_M_SPLICING_d1c3abdb2ec5518b.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_E2E45BB672622C23_M_SPLICING_d1c3abdb2ec5518b_mask.png
+    Area ratio: 0.0095367431640625
+  SRC_DW_CE0A4B01E1A091FC_M_SPLICING_b40184593593ac6a:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20171113-101323-0.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_CE0A4B01E1A091FC_M_SPLICING_b40184593593ac6a.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_CE0A4B01E1A091FC_M_SPLICING_b40184593593ac6a_mask.png
+    Area ratio: 0.0095367431640625
+  SRC_DW_228A9A730BEC0AB6_M_SPLICING_2e0ae4689be44cfd:
+    Original: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\sources\deepweeds_raw\images\20170727-155232-3.jpg
+    Manipulated: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\manipulated\SRC_DW_228A9A730BEC0AB6_M_SPLICING_2e0ae4689be44cfd.jpg
+    Mask: C:\Users\Shubham\Documents\Photocopy-That-Lied-main\Photocopy-That-Lied-main\dataset_v2\ariants\masks\SRC_DW_228A9A730BEC0AB6_M_SPLICING_2e0ae4689be44cfd_mask.png
+    Area ratio: 0.02203369140625

@@ -54,9 +54,7 @@ describe('Processing Component', () => {
     )
 
     expect(screen.getByText('Analyzing Image')).toBeInTheDocument()
-    expect(screen.getByText('Image validated')).toBeInTheDocument()
-    expect(screen.getByText('File fingerprint generated')).toBeInTheDocument()
-    expect(screen.getByText('Metadata analyzed')).toBeInTheDocument()
+    expect(screen.getByText(/Image validated/)).toBeInTheDocument()
   })
 
   it('shows all processing steps', () => {
@@ -68,18 +66,16 @@ describe('Processing Component', () => {
 
     const steps = [
       'Image validated',
-      'File fingerprint generated',
-      'Metadata analyzed',
-      'Copy-move analysis',
-      'Local anomaly analysis',
-      'Compression analysis',
-      'Natural-processing comparison',
-      'Evidence fusion',
-      'Report generated'
+      'Metadata inspected',
+      'Compression evidence analyzed',
+      'Noise characteristics analyzed',
+      'Spatial anomalies analyzed',
+      'Combining forensic evidence',
+      'Generating report'
     ]
 
     steps.forEach(step => {
-      expect(screen.getByText(step)).toBeInTheDocument()
+      expect(screen.getByText(new RegExp(step, 'i'))).toBeInTheDocument()
     })
   })
 

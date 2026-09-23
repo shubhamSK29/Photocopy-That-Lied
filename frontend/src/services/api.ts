@@ -21,36 +21,59 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   async getConfig(): Promise<UploadConfig> {
-    return request<UploadConfig>('/api/config');
+    try {
+      return await request<UploadConfig>('/api/config');
+    } catch (error) {
+      console.error('Failed to fetch config:', error);
+      throw new Error('Cannot connect to analysis server. Please ensure the backend is running on port 8000.');
+    }
   },
 
   async analyzeImage(file: File): Promise<AnalysisResult> {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/api/analyze`, {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/analyze`, {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: { message: 'Analysis failed' } }));
-      throw new Error(error.detail?.message || `HTTP ${response.status}`);
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ detail: { message: 'Analysis failed' } }));
+        throw new Error(error.detail?.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Failed to analyze image:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Network error occurred while uploading image. Please check your connection.');
     }
-
-    return response.json();
   },
 
   async getAnalysis(analysisId: string): Promise<AnalysisResult> {
-    return request<AnalysisResult>(`/api/analysis/${analysisId}`);
+    try {
+      return await request<AnalysisResult>(`/api/analysis/${analysisId}`);
+    } catch (error) {
+      console.error('Failed to fetch analysis:', error);
+      throw new Error('Failed to load analysis results. Please try again.');
+    }
   },
 
   async getArtifact(analysisId: string, name: string): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/api/artifacts/${analysisId}/${name}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch artifact: ${name}`);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/artifacts/${analysisId}/${name}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch artifact: ${name}`);
+      }
+      return response.blob();
+    } catch (error) {
+      console.error('Failed to fetch artifact:', error);
+      throw new Error('Failed to load image artifact. Please try again.');
     }
-    return response.blob();
   },
 
   getArtifactUrl(analysisId: string, name: string): string {

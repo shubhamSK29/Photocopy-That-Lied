@@ -82,6 +82,7 @@ def validate_all_masks(rows: List[Dict]) -> Dict:
         "masks_validated": 0,
         "masks_missing": [],
         "masks_failed": [],
+        "ratio_inconsistencies": [],
         "mask_summary": {
             "total": 0,
             "valid": 0,
@@ -102,8 +103,8 @@ def validate_all_masks(rows: List[Dict]) -> Dict:
             results["mask_summary"]["missing"] += 1
             continue
         
-        mask_file = DATASET_V2 / mask_path
-        image_path = DATASET_V2 / row.get("image_path", "")
+        mask_file = ROOT / mask_path
+        image_path = ROOT / row.get("image_path", "")
         
         try:
             img = Image.open(image_path)
@@ -112,6 +113,24 @@ def validate_all_masks(rows: List[Dict]) -> Dict:
             validation = validate_mask(mask_file, expected_size)
             results["masks_validated"] += 1
             results["mask_summary"]["total"] += 1
+            
+            # Validate manipulation area ratio consistency
+            if validation["readable"] and validation["not_empty"]:
+                mask = Image.open(mask_file)
+                mask_array = np.array(mask)
+                computed_ratio = np.count_nonzero(mask_array) / (mask_array.shape[0] * mask_array.shape[1])
+                
+                stored_ratio = row.get("parameters", {}).get("manipulation_area_ratio")
+                
+                if stored_ratio is not None:
+                    # Allow small floating point differences
+                    if abs(computed_ratio - stored_ratio) > 0.001:
+                        results["ratio_inconsistencies"].append({
+                            "image_id": row["image_id"],
+                            "computed_ratio": computed_ratio,
+                            "stored_ratio": stored_ratio,
+                            "difference": abs(computed_ratio - stored_ratio)
+                        })
             
             if all([validation["readable"], validation["dimensions_match"], 
                    validation["valid_values"], validation["not_empty"]]):
@@ -144,6 +163,7 @@ def print_report(results: Dict):
     print(f"Masks validated: {results['masks_validated']}")
     print(f"Masks missing: {len(results['masks_missing'])}")
     print(f"Masks failed validation: {len(results['masks_failed'])}")
+    print(f"Ratio inconsistencies: {len(results['ratio_inconsistencies'])}")
     
     summary = results["mask_summary"]
     print(f"\nMask Summary:")
@@ -162,6 +182,11 @@ def print_report(results: Dict):
         for failure in results["masks_failed"][:10]:
             print(f"  - {failure['image_id']}: {failure.get('errors', failure.get('error'))}")
     
+    if results["ratio_inconsistencies"]:
+        print(f"\nRatio inconsistencies (first 10):")
+        for inconsistency in results["ratio_inconsistencies"][:10]:
+            print(f"  - {inconsistency['image_id']}: computed={inconsistency['computed_ratio']:.4f}, stored={inconsistency['stored_ratio']:.4f}")
+    
     print("\n" + "=" * 80)
 
 
@@ -177,14 +202,28 @@ def main():
     print_report(results)
     
     # Save report
-    report_file = ROOT / "reports" / "PHASE_2_MASK_AUDIT.json"
+    report_file = ROOT / "reports" / "PHASE_19_MASK_AUDIT.json"
     report_file.parent.mkdir(exist_ok=True)
     with report_file.open("w") as f:
         json.dump(results, f, indent=2)
     
     print(f"\nReport saved to: {report_file}")
     
-    return 0
+    # Check for critical issues
+    has_critical_issues = (
+        len(results["masks_missing"]) > 0 or
+        len(results["masks_failed"]) > 0
+    )
+    
+    if has_critical_issues:
+        print("\n[X] MASK VALIDATION FAILED - Critical issues found")
+        return 1
+    elif len(results["ratio_inconsistencies"]) > 0:
+        print(f"\n[WARNING] {len(results['ratio_inconsistencies'])} ratio inconsistencies found (non-critical)")
+        return 0
+    else:
+        print("\n[OK] MASK VALIDATION PASSED")
+        return 0
 
 
 if __name__ == "__main__":
