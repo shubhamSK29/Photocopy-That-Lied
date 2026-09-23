@@ -1,0 +1,19 @@
+# Exclude heavy directories from Vercel deployment
+dataset/
+dataset_v2/
+uploads/
+artifacts/
+reports/
+models/
+demo/
+backup/
+scripts/
+docs/
+frontend/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+streamlit_app.py
+run.bat
+run.ps1
